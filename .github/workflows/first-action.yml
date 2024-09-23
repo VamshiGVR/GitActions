@@ -1,7 +1,9 @@
+#Declared Name
 name: First WorkFlow
 
+#Events
 on: workflow_dispatch
-jobs: 
+jobs:
   first-job:
     runs-on: ubuntu-latest
     steps:
@@ -10,3 +12,4 @@ jobs:
       - name: Print GOODBYE
         run: echo "DONE_BYE"
       
+#
