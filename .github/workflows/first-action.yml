@@ -2,7 +2,7 @@
 name: First WorkFlow
 
 #Event
-on: workflow_dispatch #push, pullrequest
+on: push #workflow_dispatch, pullrequest
 
 #WORKFLOW
 jobs:
