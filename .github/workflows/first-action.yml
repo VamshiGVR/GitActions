@@ -14,15 +14,9 @@ jobs:
       #action 1
       - name: checkout changes
         uses: actions/checkout@v4
-      #action 3
+      #action 2
       - name: print greet
         run : echo "hello world!"
-      #action 2        
-      - name: Run Super-Linter
-        uses : github/super-linter@v3
-        env:
-          DEFAULT_BRANCH: main
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #action 4
+      #action 3
       - name: Print GOODBYE
         run : echo "DONE_BYE"
