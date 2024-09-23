@@ -1,2 +1,8 @@
 # gh-first-action
-Used to learn github Actions
+To learn github Actions
+
+can write in windows, macOs, Linux 
+link logs 
+
+
+EVENTS=>WORKFLOWS=>ACTIONS
