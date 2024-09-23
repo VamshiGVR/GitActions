@@ -1,4 +1,4 @@
-# gh-first-action
+# git-actions
 To learn github Actions
 
 can write in windows, macOs, Linux 
