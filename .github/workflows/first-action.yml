@@ -13,7 +13,7 @@ jobs:
     steps:
       #action 1
       - name: checkout changes
-        run : actions/checkout@v4
+        uses: actions/checkout@v4
       #action 2        
       - name: print greet
         run : echo "hello world!"
