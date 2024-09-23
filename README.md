@@ -6,3 +6,8 @@ link logs
 
 
 EVENTS=>WORKFLOWS=>ACTIONS
+
+
+
+1) learn about runners
+2) super linter
