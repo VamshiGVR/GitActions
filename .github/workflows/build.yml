@@ -1,0 +1,42 @@
+# .github/workflows/build.yml
+
+#Name: is the name of the workflow. It's optional but is highly recommended.
+name: Node Build.
+
+#On: is the event or list of events that will trigger the workflow
+#on: [push]
+#[push, pull_request]
+on:
+    pull_request:
+        branches:
+            - develop
+#Cron schedules are based on five values:
+#Minute (0 - 59)
+#Hour (0 - 23)
+#Day of the month (1 - 31)
+#Month (1 - 12)
+#Day of the week (0 - 6)
+#Aliases for the months are JAN-DEC and for days of the week are SUN-SAT.
+#So, in the example, the schedule would be 8 AM - 5 PM Monday to Friday.
+schedule:
+        - cron: '0 8-17 * * 1-5'
+
+
+#Jobs: is the list of jobs to be executed. Workflows can contain one or more jobs.
+jobs:
+#Runs-on: tells Actions which runner to use.
+  startup:
+    runs-on: ubuntu-latest
+
+#Steps: It's the list of steps for the job. Steps within a job execute on the same runner.
+    steps:
+    
+#Uses: tells Actions, which predefined action needs to be retrieved.
+    - uses: actions/checkout@v1
+    - name: Run node.js on latest Windows.
+      uses: actions/setup-node@v1
+    - name: Install NPM and build.
+#Run: tells the job to execute a command on the runner.
+      run: |
+        npm ci
+        npm run build
