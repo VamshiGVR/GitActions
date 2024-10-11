@@ -7,9 +7,9 @@ name: Node Build.
 #on: [push]
 #[push, pull_request]
 on:
-    pull_request:
+    push:
         branches:
-            - develop
+            - main
 #Cron schedules are based on five values:
 #Minute (0 - 59)
 #Hour (0 - 23)
@@ -25,8 +25,8 @@ schedule:
 #Jobs: is the list of jobs to be executed. Workflows can contain one or more jobs.
 jobs:
 #Runs-on: tells Actions which runner to use.
-  startup:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-latest #[Ubuntu-latest, Linux, Microsoft Windows, and macOS.]
 
 #Steps: It's the list of steps for the job. Steps within a job execute on the same runner.
     steps:
@@ -40,3 +40,20 @@ jobs:
       run: |
         npm ci
         npm run build
+        
+    steps:
+    - uses: actions/upload-artifact
+          with:
+       name: harness-build-logs
+        path: bin/output/logs/
+
+
+    - uses: actions/download-artifact
+      with:
+        name: harness-build-log
+
+        - uses: actions/upload-artifact
+       with:
+    name: harness-build-log
+    path: bin/output/logs/harness.log
+    retention-days: 12
