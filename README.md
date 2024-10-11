@@ -1,5 +1,7 @@
 # git-actions
-To learn github Actions
+To learn 
+
+github Actions
 https://learn.microsoft.com/en-us/training/modules/introduction-to-github-actions/3-explore-actions-flow
 
 CI
