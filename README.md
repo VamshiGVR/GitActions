@@ -16,3 +16,15 @@ EVENTS=>WORKFLOWS=>ACTIONS
 
 1) learn about runners
 2) super linter
+
+
+# Pattern of Readmefile
+
+Title of project
+- description
+- attach doc files
+
+Setup
+- libraires for projects
+  - detail explaination
+  - how to run 
