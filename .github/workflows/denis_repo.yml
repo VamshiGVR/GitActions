@@ -29,49 +29,74 @@ jobs:
       - name: Configure Variables
         id: build_vars
         uses: ./.github/actions/build-vars
-ci:
-  name: CI
-  runs-on: ubuntu-latest
-  needs: set variables
-  if: ${{ (needs.set_variables.outputs.has_python_changes 'true') || (needs.sets_variables.outputs.has_tablea_changes == 'true')}}
-  steps:
-    - name: Check out changes
-      uses: actions/checkout@v4
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: 3.9
-    - name: Install dependencies
-      run: |
-        python-m pip install --upgrade pip
-        pip install -r requirements.txt
-        python setup.py install
-        pip install pytest pytest-cov
-    - name: Run PyLint
-      run: |
-        pylint --recursive=y etl/tests/tableau/
-    - name: Run Tableau unit tests
-      if : ${{ needs.set_variables.outputs.has.tableau_changes == 'true'}}
-      run: |
-        pytest tests/tableau
-    - name: Run backend unit tests
-      if: ${{ needs.set_varibales.ouputs.has_python_changes == 'true'}}
-      run : |
-        pytest tests/unit tests/integration tests/mocks --cov=etl --cov-report=term-missing --cov-report=html --cov-config=.coveragerc
-    - name: Upload test results
-      uses: action/upload-artifacts@v4
-      with: 
-        name: pytest-results
-        path: htmlcpv/
-        # Use always() to always run this step tp publish test results when there are test failures
-        if: ${{always() }}
-end2end:
-  name: END to END tests
-  runs-on: ubuntu-latest
-  needs: set_variables
-  if: ${{ needs.set_variables.outputs.has_etl_changes == 'true'}}
-  steps:
-    - name: Check out changes
-      uses: actions/changes@v4
-    - name: Set up Python
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+    needs: set_variables
+    if: ${{ (needs.set_variables.outputs.has_python_changes 'true') || (needs.sets_variables.outputs.has_tablea_changes == 'true')}}
+    steps:
+      - name: Check out changes
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+        run: |
+          python-m pip install --upgrade pip
+          pip install -r requirements.txt
+          python setup.py install
+          pip install pytest pytest-cov
+      - name: Run PyLint
+        run: |
+          pylint --recursive=y etl/tests/tableau/
+      - name: Run Tableau unit tests
+        if : ${{ needs.set_variables.outputs.has.tableau_changes == 'true'}}
+        run: |
+          pytest tests/tableau
+      - name: Run backend unit tests
+        if: ${{ needs.set_varibales.ouputs.has_python_changes == 'true'}}
+        run : |
+          pytest tests/unit tests/integration tests/mocks --cov=etl --cov-report=term-missing --cov-report=html --cov-config=.coveragerc
+      - name: Upload test results
+        uses: action/upload-artifacts@v4
+        with: 
+          name: pytest-results
+          path: htmlcpv/
+          # Use always() to always run this step tp publish test results when there are test failures
+          if: ${{always() }}
+  end2end:
+    name: END to END tests
+    runs-on: ubuntu-latest
+    needs: set_variables
+    if: ${{ needs.set_variables.outputs.has_etl_changes == 'true'}}
+    steps:
+      - name: Check out changes
+        uses: actions/changes@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with: 
+          python-version: 3.9
+      - name: Install Databricks SQL Connector and requirements
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r reuirement.txt
+          pip install pytest
+      - name: Install Azure CLI
+        run: |
+          curl -sl https://aka.ms/InstallAzureCLIDeb | sudo bash
+      - name: Acquire Lock 
+        uses: nick-fields/retry@v3
+        with: 
+          max_attemps: 1
+          timeouy_seconds: 3600
+          shell: bash
+          command: "python -m utils.acquire_ci_lock --host ${{ secrets.DATABRICKS_HOST }} --path ${{ secrets.DATABRICKS_PATH }} --token ${{ secrets.DATABRICKS_TOKEN }} --schema ci_support --catalog ${{ secrets.DATABRICKS_CATALOG }} --run_id ${{github.run_id}} --lock_timeout 1200"
+      - name: Wait for CI cluster to become available
+        uses: ./.github/actions/databricks-cli
+        with: 
+          command: "databricks pipelines list-updates 'databricks pipelines list-pipelines --filter\ " name like 'ci'\" --max-results 1 | jq -r .[].pipeline_id' | jq -r .updates[0].state | grep -E \"(FAILURES) 
+
+
+
           
