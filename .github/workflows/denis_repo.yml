@@ -1,2 +1,58 @@
 #This repo is for learning purpose
 
+name: CI/CD Pipeline
+
+on:
+  pull_request:
+    branches: 
+      -main
+      -develop
+  push: 
+    branches:
+      - main
+      - develop
+
+env:
+  BRANCH: ${{ github.head_ref || github.ref_name }}
+concurrency:
+  group: ${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+jobs:
+  set_variables:
+    name: Configuring Variables
+    runs-on: ubuntu-latest
+    outputs:  
+      has_python_changes: ${{ steps.build_vars.outputs.has_python_changes }}
+      has_etl_changes: ${{ steps.build_vars.outputs.has_etl_changes }}
+      has_tableau_changes: ${{ steps.build_vars.outputs.has_tableau_changes }}
+    steps:
+      - name: Check out changes
+        uses: actions/checkout@v4
+      - name: Configure Variables
+        id: build_vars
+        uses: ./.github/actions/build-vars
+ci:
+  name: CI
+  runs-on: ubuntu-latest
+  needs: set variables
+  if: ${{ (needs.set_variables.outputs.has_python_changes 'true') || (needs...
+  steps:
+    - name: Check out changes
+      uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+    run: |
+      python-m pip install --upgrade pip
+      pip install -r requirements.txt
+      python setup.py install
+    - name: Run PyLint
+      run: |
+        pylint --recursive=y etl/tests/tableau/
+    - name: Run Tableau unit tests
+      if : ${{ needs.set_variables.outputs.has.tableau_changes == 'true'}}
+      run: |
+        pytest tests/tableau
+      
